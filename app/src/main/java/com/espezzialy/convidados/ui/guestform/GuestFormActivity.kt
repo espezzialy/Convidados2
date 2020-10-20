@@ -7,11 +7,13 @@ import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.espezzialy.convidados.R
+import com.espezzialy.convidados.service.constants.GuestConstants
 import kotlinx.android.synthetic.main.activity_guest_form.*
 
 class GuestFormActivity : AppCompatActivity(), View.OnClickListener {
 
     private lateinit var mViewModel: GuestFormViewModel
+    private var mGuestId: Int = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,30 +24,54 @@ class GuestFormActivity : AppCompatActivity(), View.OnClickListener {
 
         setListeners()
         observe()
+        loadData()
+
+        radio_presence.isChecked = true
     }
 
-    override fun onClick(v: View){
+    override fun onClick(v: View) {
         val id = v.id
-        if (id == R.id.button_save){
+        if (id == R.id.button_save) {
             val name = edit_name.text.toString()
             val presence = radio_presence.isChecked
-            mViewModel.save(name, presence)
+            mViewModel.save(mGuestId, name, presence)
 
         }
     }
 
-    private fun setListeners(){
+    private fun loadData() {
+        val bundle = intent.extras
+        if (bundle != null) {
+            mGuestId = bundle.getInt(GuestConstants.GUESTID)
+            mViewModel.load(mGuestId)
+        }
+    }
+
+    private fun setListeners() {
         button_save.setOnClickListener(this)
     }
 
-    private fun observe(){
+    private fun observe() {
         mViewModel.saveGuest.observe(this, Observer {
-            if(it){
-                Toast.makeText(applicationContext, "Sucesso", Toast.LENGTH_SHORT).show()
+            if (edit_name.length() != 0){
+                if (it) {
+                    Toast.makeText(applicationContext, "Sucesso", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(applicationContext, "Falha", Toast.LENGTH_SHORT).show()
+                }
+                finish()
             } else {
-                Toast.makeText(applicationContext, "Falha", Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext, "Nome Obrigatório", Toast.LENGTH_SHORT).show()
             }
-            finish()
+        })
+
+        mViewModel.guest.observe(this, Observer {
+            edit_name.setText(it.name)
+            if (it.presence) {
+                radio_presence.isChecked = true
+            } else {
+                radio_absent.isChecked = true
+            }
         })
     }
 

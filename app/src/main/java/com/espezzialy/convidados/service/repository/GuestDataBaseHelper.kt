@@ -1,4 +1,4 @@
-package com.espezzialy.convidados
+package com.espezzialy.convidados.service.repository
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase

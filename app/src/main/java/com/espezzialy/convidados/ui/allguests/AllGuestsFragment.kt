@@ -1,5 +1,6 @@
 package com.espezzialy.convidados.ui.allguests
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,25 +8,71 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.espezzialy.convidados.R
+import com.espezzialy.convidados.service.constants.GuestConstants
+import com.espezzialy.convidados.ui.guestform.GuestFormActivity
+import com.espezzialy.convidados.ui.listener.GuestListener
+import kotlinx.android.synthetic.main.fragment_all.*
+import kotlinx.android.synthetic.main.fragment_all.view.*
 
 class AllGuestsFragment : Fragment() {
 
-  private lateinit var allGuestsViewModel: AllGuestsViewModel
+    private lateinit var mViewModel: AllGuestsViewModel
+    private val mAdapter: GuestAdapter = GuestAdapter()
+    private lateinit var mListener: GuestListener
 
-  override fun onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup?,
-    savedInstanceState: Bundle?
-  ): View? {
-    allGuestsViewModel =
-    ViewModelProviders.of(this).get(AllGuestsViewModel::class.java)
-    val root = inflater.inflate(R.layout.fragment_home, container, false)
-    val textView: TextView = root.findViewById(R.id.text_home)
-    allGuestsViewModel.text.observe(viewLifecycleOwner, Observer {
-      textView.text = it
-    })
-    return root
-  }
+    override fun onCreateView(
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?
+    ): View? {
+        mViewModel = ViewModelProvider(this).get(AllGuestsViewModel::class.java)
+
+        val root = inflater.inflate(R.layout.fragment_all, container, false)
+//    1 - Obter a Recycler View
+        val recycler = root.findViewById<RecyclerView>(R.id.recycler_all_guests)
+//    2- Definir um layout
+        recycler.layoutManager = LinearLayoutManager(context)
+//    3- Definir um adapter
+        recycler.adapter = mAdapter
+
+        mListener = object : GuestListener {
+            override fun onClick(id: Int) {
+              val intent = Intent(context, GuestFormActivity::class.java)
+              val bundle = Bundle()
+              bundle.putInt(GuestConstants.GUESTID, id)
+
+              intent.putExtras(bundle)
+              startActivity(intent)
+            }
+
+            override fun onDelete(id: Int) {
+                mViewModel.delete(id)
+                mViewModel.load(GuestConstants.FILTER.EMPTY)
+            }
+        }
+
+        mAdapter.attachListener(mListener)
+
+        observer()
+
+        mViewModel.load(GuestConstants.FILTER.EMPTY)
+
+        return root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mViewModel.load(GuestConstants.FILTER.EMPTY)
+    }
+
+    private fun observer() {
+        mViewModel.guestList.observe(viewLifecycleOwner, Observer {
+          mAdapter.updateGuests(it)
+        })
+    }
+
 }
