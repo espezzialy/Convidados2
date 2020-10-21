@@ -2,14 +2,30 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="wrap_content">
-
+<LinearLayout
+    android:id="@+id/name_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
     <TextView
         android:id="@+id/text_name"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="16dp"
         android:textSize="14sp"
         android:text="Convidado"/>
+
+    <TextView
+        android:padding="16dp"
+        android:id="@+id/text_presence"
+        android:text="Presente"
+        android:gravity="end"
+        android:textAlignment="textEnd"
+        android:layout_gravity="right"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+</LinearLayout>
+
     <View
         android:padding="16dp"
         android:background="@color/colorPrimary"
