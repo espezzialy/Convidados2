@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.espezzialy.convidados.R
 import com.espezzialy.convidados.service.constants.GuestConstants
+import com.espezzialy.convidados.service.model.GuestModel
 import com.espezzialy.convidados.ui.guestform.GuestFormActivity
 import com.espezzialy.convidados.ui.listener.GuestListener
 import kotlinx.android.synthetic.main.fragment_all.*
